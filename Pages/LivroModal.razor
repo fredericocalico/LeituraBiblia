@@ -1,0 +1,70 @@
+﻿@using Biblia.Data
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="modal fade show d-block" style="background:rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">@Livro.Nome</h5>
+        <button type="button" class="btn-close" @onclick="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-2">
+          @for (int i = 1; i <= Livro.Capitulos; i++)
+          {
+            var idx = i;           // <- cópia local, evita captura do loop
+            <div class="col-3 col-sm-2 col-md-2" @key="idx">
+              <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="@($"cap{idx}")"
+                       @bind="Marcados[idx]" />
+                <label class="form-check-label" for="@($"cap{idx}")">@idx</label>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="Salvar">Salvar</button>
+        <button class="btn btn-secondary" @onclick="Fechar">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+  [Parameter] public Livro Livro { get; set; } = default!;
+  [Parameter] public Dictionary<string, List<int>> Progresso { get; set; } = new();
+  [Parameter] public EventCallback OnFechar { get; set; }
+  [Parameter] public EventCallback<List<int>> OnSalvar { get; set; }
+
+  private Dictionary<int, bool> Marcados = new();
+
+  protected override void OnParametersSet()
+  {
+    // inicializa 1..N como false
+    Marcados = Enumerable.Range(1, Livro.Capitulos)
+      .ToDictionary(i => i, _ => false);
+
+    // aplica lidos já salvos
+    if (Progresso.TryGetValue(Livro.Nome, out var lidos))
+      foreach (var cap in lidos)
+        if (Marcados.ContainsKey(cap)) Marcados[cap] = true;
+  }
+
+  private Task Fechar() => OnFechar.InvokeAsync();
+
+  private Task Salvar()
+  {
+    var selecionados = Marcados
+      .Where(kv => kv.Value)
+      .Select(kv => kv.Key)
+      .OrderBy(x => x)
+      .ToList();
+
+    return OnSalvar.InvokeAsync(selecionados);
+  }
+}
