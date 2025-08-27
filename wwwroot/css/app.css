@@ -123,7 +123,7 @@ code {
 
 /* Card “flat”: sem borda, sem sombra */
 .card-plain{
-    border:0 !important;
+    border: #b4b4b7 1px solid !important;
     box-shadow:none !important;
     border-radius:.75rem;       /* opcional */
     color:#1a1a1a;              /* texto legível nas cores claras */
