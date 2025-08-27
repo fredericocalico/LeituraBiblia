@@ -116,9 +116,9 @@ code {
 
 
 :root{
-    --ot:#c79cd6;      /* Velho Testamento */
-    --nt:#b775cb;      /* Novo Testamento  */
-    --total:#a74ec0;   /* Bíblia inteira    */
+    --ot:#d6d6db;      /* Velho Testamento */
+    --nt:#d6d6db;      /* Novo Testamento  */
+    --total:#d6d6db;   /* Bíblia inteira    */
 }
 
 /* Card “flat”: sem borda, sem sombra */
@@ -145,4 +145,4 @@ code {
 .card-plain.clickable{ cursor:pointer; }
 
 /* wwwroot/css/app.css (ou o seu CSS principal) */
-html, body { background:#d7c3e1; }
+html, body { background:#E5E9EB; }

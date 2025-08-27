@@ -8,7 +8,7 @@
   <h3 class="text-center mb-4"><img src="icons/icon-192.png" style="width: 50px"/> Controle de Leitura</h3>
   
   <div class="container text-center" >
-    <h6 style="font-size: 75%; padding: 3px; margin: 5px">Use este app para marcar seu progresso na leitura da Bíblia Sagrada. Que Deus te abençoe em sua jornada de leitura e conhecimento da palavra!</h6>  
+    <h6 style="font-size: 85%; padding: 3px; margin: 5px">Use este app para marcar seu progresso na leitura da Bíblia Sagrada. Que Deus te abençoe em sua jornada de leitura e conhecimento da palavra!</h6>  
   </div>
 
   <!-- Resumos -->
@@ -51,7 +51,7 @@
       <div class="col-12 col-md-6 col-lg-4">
         <div class="@CardClass(livro)" @onclick="() => AbrirLivro(livro)">
           <div class="card-body d-flex flex-column justify-content-between text-center">
-            <h6 class="mb-2">@livro.Nome</h6>
+            <h6 class="mb-2 align-content-center text-center">@livro.Nome <label style="@BadgeStyleColor(livro)">@livro.Testamento.Substring(0,1)T </label> </h6>
 
             <div class="mt-1">
               <div class="progress" role="progressbar" aria-label="Progresso do livro">
@@ -87,6 +87,9 @@
   
   private string CardClass(Livro l)
     => $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}";
+
+  private string BadgeStyleColor(Livro l) =>
+    $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 60%; padding: 3px";
 
   protected override async Task OnInitializedAsync()
   {
