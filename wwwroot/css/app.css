@@ -73,6 +73,7 @@ a, .btn-link {
     width: 8rem;
     height: 8rem;
     margin: 20vh auto 1rem auto;
+    background: #cacacd;
 }
 
     .loading-progress circle {
@@ -112,3 +113,33 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+
+:root{
+    --ot:#efb99c;      /* Velho Testamento */
+    --nt:#98bcda;      /* Novo Testamento  */
+    --total:#a7abab;   /* Bíblia inteira    */
+}
+
+/* Card “flat”: sem borda, sem sombra */
+.card-plain{
+    border:0 !important;
+    box-shadow:none !important;
+    border-radius:.75rem;       /* opcional */
+    color:#1a1a1a;              /* texto legível nas cores claras */
+}
+.bg-ot{ background-color:var(--ot) !important; }
+.bg-nt{ background-color:var(--nt) !important; }
+.bg-total{ background-color:var(--total) !important; }
+
+/* Barrinha de progresso legível sobre o fundo colorido */
+.card-plain .progress{
+    height:18px;
+    background-color:rgba(0,0,0,.12);
+}
+.card-plain .progress-bar{
+    background-color:rgba(0,0,0,.55);
+}
+
+/* Clique mais óbvio nos cards de livros */
+.card-plain.clickable{ cursor:pointer; }

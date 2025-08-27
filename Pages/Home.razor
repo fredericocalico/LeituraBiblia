@@ -5,7 +5,7 @@
 <PageTitle>Leitura da Bíblia</PageTitle>
 
 <div class="container py-3">
-  <h3 class="text-center mb-4"><img src="icon-192.png" style="width: 50px"/> Controle de Leitura</h3>
+  <h3 class="text-center mb-4"><img src="icons/icon-192.png" style="width: 50px"/> Controle de Leitura</h3>
   
   <br/>
   <div class="container text-center">
@@ -15,7 +15,7 @@
   <!-- Resumos -->
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-4">
-      <div class="card text-center shadow-sm">
+      <div class="card card-plain text-center bg-total">
         <div class="card-body">
           <h5 class="card-title">Bíblia inteira</h5>
           <p class="display-6 fw-bold mb-0">@ProgressoBiblia%</p>
@@ -23,8 +23,9 @@
         </div>
       </div>
     </div>
+
     <div class="col-6 col-md-4">
-      <div class="card text-center shadow-sm">
+      <div class="card card-plain text-center bg-ot">
         <div class="card-body">
           <h5 class="card-title">Velho Testamento</h5>
           <p class="display-6 fw-bold mb-0">@ProgressoVelho%</p>
@@ -32,8 +33,9 @@
         </div>
       </div>
     </div>
+
     <div class="col-6 col-md-4">
-      <div class="card text-center shadow-sm">
+      <div class="card card-plain text-center bg-nt">
         <div class="card-body">
           <h5 class="card-title">Novo Testamento</h5>
           <p class="display-6 fw-bold mb-0">@ProgressoNovo%</p>
@@ -48,17 +50,17 @@
     @foreach (var livro in BibliaData.Livros)
     {
       <div class="col-12 col-md-6 col-lg-4">
-        <div class="card shadow-sm h-100" style="cursor:pointer" @onclick="() => AbrirLivro(livro)">
+        <div class="@CardClass(livro)" @onclick="() => AbrirLivro(livro)">
           <div class="card-body d-flex flex-column justify-content-between text-center">
-            <div>
-              <h6 class="mb-1">@livro.Nome</h6>
-              <small class="text-muted">@livro.Testamento</small>
-            </div>
-            <div class="mt-2">
+            <h6 class="mb-2">@livro.Nome</h6>
+
+            <div class="mt-1">
               <div class="progress" role="progressbar" aria-label="Progresso do livro">
-                <div class="progress-bar" style="width:@CalcularPercentual(livro)%">@CalcularPercentual(livro)%</div>
+                <div class="progress-bar" style="width:@CalcularPercentual(livro)%">
+                  @CalcularPercentual(livro)%
+                </div>
               </div>
-              <small class="text-muted">@LidosLivro(livro)/@livro.Capitulos caps</small>
+              <small>@LidosLivro(livro)/@livro.Capitulos caps</small>
             </div>
           </div>
         </div>
@@ -83,6 +85,9 @@
   private int ProgressoBiblia, ProgressoVelho, ProgressoNovo;
   private int TotalCapitulos, TotalVelho, TotalNovo;
   private int LidosTotais, LidosVelho, LidosNovo;
+  
+  private string CardClass(Livro l)
+    => $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}";
 
   protected override async Task OnInitializedAsync()
   {

@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PROJECT_PATH: Biblia
+  PROJECT_PATH: .
 
 jobs:
   build:
