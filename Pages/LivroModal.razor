@@ -27,9 +27,14 @@
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-primary" @onclick="Salvar">Salvar</button>
-        <button class="btn btn-secondary" @onclick="Fechar">Fechar</button>
+      <div class="modal-footer d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-secondary btn-sm" @onclick="MarcarTodos">Marcar todos</button>
+        <button class="btn btn-outline-secondary btn-sm" @onclick="DesmarcarTodos">Desmarcar</button>
+
+        <div class="ms-auto">
+          <button class="btn btn-primary" @onclick="Salvar">Salvar</button>
+          <button class="btn btn-secondary" @onclick="Fechar">Fechar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -66,5 +71,18 @@
       .ToList();
 
     return OnSalvar.InvokeAsync(selecionados);
+  }
+  
+  private void MarcarTodos()
+  {
+    // marca 1..N
+    foreach (var k in Marcados.Keys.ToList())
+      Marcados[k] = true;
+  }
+
+  private void DesmarcarTodos()
+  {
+    foreach (var k in Marcados.Keys.ToList())
+      Marcados[k] = false;
   }
 }
