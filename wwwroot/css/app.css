@@ -116,14 +116,14 @@ code {
 
 
 :root{
-    --ot:#d6d6db;      /* Velho Testamento */
-    --nt:#d6d6db;      /* Novo Testamento  */
-    --total:#d6d6db;   /* Bíblia inteira    */
+    --ot:#ffffff;      /* Velho Testamento */
+    --nt:#ffffff;      /* Novo Testamento  */
+    --total:#ffffff;   /* Bíblia inteira    */
 }
 
 /* Card “flat”: sem borda, sem sombra */
 .card-plain{
-    border: #b4b4b7 1px solid !important;
+    border: #f3edef 1px solid !important;
     box-shadow:none !important;
     border-radius:.75rem;       /* opcional */
     color:#1a1a1a;              /* texto legível nas cores claras */
@@ -138,11 +138,11 @@ code {
     background-color:rgba(0,0,0,.12);
 }
 .card-plain .progress-bar{
-    background-color:rgba(0,0,0,.55);
+    background-color:rgba(0,0,0,.22);
 }
 
 /* Clique mais óbvio nos cards de livros */
 .card-plain.clickable{ cursor:pointer; }
 
 /* wwwroot/css/app.css (ou o seu CSS principal) */
-html, body { background:#E5E9EB; }
+html, body { background:#f9f6f7; }

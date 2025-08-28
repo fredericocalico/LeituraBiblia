@@ -8,7 +8,7 @@
 
 <PageTitle>Leitura da Bíblia</PageTitle>
 
-<div class="container py-3">
+<div class="container py-3" style="max-width: 700px">
   <h3 class="text-center mb-4"><img src="icons/icon-192.png" style="width: 50px"/> Controle de Leitura</h3>
   
   <div class="container text-center" >
@@ -17,32 +17,33 @@
 
   <!-- Resumos -->
   <div class="row g-3 mb-3">
-    <div class="col-12 col-md-4">
-      <div class="card card-plain text-center bg-total">
-        <div class="card-body">
-          <h5 class="card-title">Bíblia inteira</h5>
-          <p class="display-6 fw-bold mb-0">@ProgressoBiblia%</p>
-          <small>@LidosTotais/@TotalCapitulos capítulos</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-4">
+    
+    <div class="col-4 col-md-4">
       <div class="card card-plain text-center bg-ot">
         <div class="card-body">
-          <h5 class="card-title">Velho Testamento</h5>
+          <h6 class="card-title">Velho Test</h6>
           <p class="display-6 fw-bold mb-0">@ProgressoVelho%</p>
-          <small>@LidosVelho/@TotalVelho capítulos</small>
+          <small>@LidosVelho/@TotalVelho cap</small>
         </div>
       </div>
     </div>
 
-    <div class="col-6 col-md-4">
+    <div class="col-4 col-md-4">
       <div class="card card-plain text-center bg-nt">
         <div class="card-body">
-          <h5 class="card-title">Novo Testamento</h5>
+          <h6 class="card-title">Novo Test</h6>
           <p class="display-6 fw-bold mb-0">@ProgressoNovo%</p>
-          <small>@LidosNovo/@TotalNovo capítulos</small>
+          <small>@LidosNovo/@TotalNovo cap</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-4 col-md-4">
+      <div class="card card-plain text-center bg-total">
+        <div class="card-body">
+          <h6 class="card-title">Bíblia inteira</h6>
+          <p class="display-6 fw-bold mb-0">@ProgressoBiblia%</p>
+          <small>@LidosTotais/@TotalCapitulos cap</small>
         </div>
       </div>
     </div>
@@ -53,22 +54,43 @@
     <div class="col-12">
       <div class="card card-plain bg-total">
         <div class="card-body">
-          <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-            <div>
-              <h5 class="mb-1 text-center">Meta de Conclusão</h5>
-              <small>Até que data você pretende concluir a leitura da Bíblia inteira?</small>
+          <div>
+            <div class="row">
+              <div class="col-10">
+                <h5>Meta de Conclusão</h5>
+              </div>
+              <div class="col-2 text-end align-content-end">
+                @if (cardPlannerIsOpen)
+                {
+                  <i class="fa-solid fa-circle-arrow-up fs-2" style="color: #b3b1b2" @onclick="(() => ToogleCardPlanner())"></i>  
+                }
+                else
+                {
+                  <i class="fa-solid fa-circle-arrow-down fs-2" style="color: #b3b1b2" @onclick="(() => ToogleCardPlanner())"></i>
+                }
+              </div>
             </div>
 
-            <div class="d-flex flex-wrap align-items-center gap-2">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="incHoje" @bind="IncluirHoje" />
+            @if (cardPlannerIsOpen || ( PrazoFinal is null && !cardPlannerIsOpen ))
+            {
+              <div class="container text-center mb-2">
+                <small>Defina uma data limite para concluir a leitura da Bíblia</small>
+              </div>
+            }
+
+            @if (cardPlannerIsOpen)
+            {
+              <div class="d-flex align-items-center justify-content-center g-2">
+                <div style="min-width:220px; padding-right: 10px">
+                  <InputDate @bind-Value="PrazoFinal" class="form-control"/>
+                </div>
+                <button class="btn btn-primary" @onclick="SalvarPrazo">Salvar</button>
+              </div>
+              <div class="form-check form-switch m-2">
+                <input class="form-check-input" type="checkbox" id="incHoje" @bind="IncluirHoje"/>
                 <label class="form-check-label" for="incHoje">Contar hoje</label>
               </div>
-              <div >
-                <InputDate @bind-Value="PrazoFinal" class="form-control" style="width:140px" />
-              </div>
-              <button class="btn btn-primary" @onclick="SalvarPrazo">Salvar</button>
-            </div>
+            }
           </div>
 
           <div class="mt-3">
@@ -83,9 +105,12 @@
             else
             {
               <div class="d-flex flex-wrap gap-3 text-center align-items-center justify-content-center">
-                <span><strong>Capítulos restantes:</strong> @CapitulosRestantes</span>
-                <span><strong>Dias disponíveis:</strong> @DiasRestantes</span>
-                <span style="background-color: #26b050; border-radius: 10px; padding: 5px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
+                @if (cardPlannerIsOpen)
+                {
+                  <span><strong>Capítulos restantes:</strong> @CapitulosRestantes</span>
+                  <span><strong>Dias disponíveis:</strong> @DiasRestantes</span>
+                } 
+                <span style="background-color: #26b050; border-radius: 19px; padding: 8px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
               </div>
             }
           </div>
@@ -93,7 +118,6 @@
       </div>
     </div>
   </div>
-
   
   <!-- Livros -->
   <div class="row g-3">
@@ -101,7 +125,7 @@
     {
       <div class="col-12 col-md-6 col-lg-4">
         <div class="@CardClass(livro)" @onclick="() => AbrirLivro(livro)">
-          <div class="card-body d-flex flex-column justify-content-between text-center">
+          <div class="card-body d-flex flex-column justify-content-between text-center align-middle">
             <h6 class="mb-2 align-content-center text-center">@livro.Nome <label style="@BadgeStyleColor(livro)">@livro.Testamento.Substring(0,1)T </label> </h6>
 
             <div class="mt-1">
@@ -128,9 +152,10 @@
 <br/>
 
 <div class="container text-center">
-  <label>Desenvolvido por Antonio Frederico | <a href="mailto:fredericocalico@gmail.com">Envie-me um e-mail</a></label>
+  <label style="font-size: 80%">Desenvolvido por Antonio Frederico | <a href="mailto:fredericocalico@gmail.com">Envie-me um e-mail</a></label>
 </div>
 
+<br/>
 
 @if (LivroSelecionado is not null)
 {
@@ -144,6 +169,7 @@
   private Dictionary<string, List<int>> Progresso = new();
   private Livro? LivroSelecionado;
   private int contador = 0;
+  private bool cardPlannerIsOpen { get; set; } = false;
 
   // Resumos
   private int ProgressoBiblia, ProgressoVelho, ProgressoNovo;
@@ -159,8 +185,10 @@
     => $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}";
 
   private string BadgeStyleColor(Livro l) =>
-    $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 60%; padding: 3px";
+    $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 70%; padding: 3px";
 
+  private void ToogleCardPlanner() => cardPlannerIsOpen = (!cardPlannerIsOpen);
+  
   protected override async Task OnInitializedAsync()
   {
     
