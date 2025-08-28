@@ -116,9 +116,9 @@ code {
 
 
 :root{
-    --ot:#ffffff;      /* Velho Testamento */
-    --nt:#ffffff;      /* Novo Testamento  */
-    --total:#ffffff;   /* Bíblia inteira    */
+    --ot:#002c7c;      /* Velho Testamento */
+    --nt:#002c7c;      /* Novo Testamento  */
+    --total:#002c7c;   /* Bíblia inteira    */
     --lido:#bbcbc3;    /* Livro Lido */
 }
 
@@ -148,3 +148,29 @@ code {
 
 /* wwwroot/css/app.css (ou o seu CSS principal) */
 html, body { background:#f9f6f7; }
+
+.badge-ot    { background-color: var(--ot)    !important; color: white }
+.badge-nt    { background-color: var(--nt)    !important; color: white }
+.badge-total { background-color: var(--total) !important; color: white }
+
+/* deixa as linhas clicáveis mais "visíveis" ao toque */
+.table-hover tbody tr { cursor: pointer; }
+
+/* cores de status do percentual */
+.badge-0{        background:#b9b9b9 !important; color:#1a1a1a !important; } /* 0% */
+.badge-progress{ background:#7939be !important; color:#ffffff !important; } /* em andamento */
+.badge-done{     background:#22a568 !important; color:#ffffff !important; } /* 100% */
+
+.badge-action {
+    cursor: pointer;
+    user-select: none;
+}
+
+.app-header{
+    position: sticky; top: 0; z-index: 1020;
+    background:#ffffff; border-bottom:1px solid rgba(0,0,0,.08);
+}
+.brand-mark{ width:28px; height:28px; }
+.brand-title{ font-weight:700; letter-spacing:.5px; }
+.brand-sub{ color:#666; }
+.brand-wide{ height:120px; } /* caso use o logo-wordmark */

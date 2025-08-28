@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+
+<div class="modal fade show d-block" style="background:rgba(0,0,0,.5);">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Meta de Conclusão</h5>
+        <button type="button" class="btn-close" @onclick="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Data-alvo</label>
+          <InputDate @bind-Value="Prazo" class="form-control" />
+          <small class="text-muted">Escolha a data em que deseja concluir a leitura.</small>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="incHoje" @bind="ContarHoje">
+          <label class="form-check-label" for="incHoje">Contar hoje</label>
+        </div>
+      </div>
+
+      <div class="modal-footer d-flex flex-wrap gap-2">
+        @if (TemMeta)
+        {
+          <button class="btn btn-outline-danger me-auto" @onclick="Remover">Remover meta</button>
+        }
+        <div class="ms-auto">
+          <button class="btn btn-primary" @onclick="Salvar">Salvar</button>
+          <button class="btn btn-secondary" @onclick="Fechar">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@code {
+  [Parameter] public DateTime? PrazoInicial { get; set; }
+  [Parameter] public bool ContarHojeInicial { get; set; } = true;
+
+  // Retorno para o pai
+  public record PlannerConfig(DateTime? PrazoFinal, bool IncluirHoje, bool Remover);
+  [Parameter] public EventCallback<PlannerConfig> OnSalvar { get; set; }
+  [Parameter] public EventCallback OnFechar { get; set; }
+
+  private DateTime? Prazo;
+  private bool ContarHoje;
+  private bool TemMeta => PrazoInicial is not null;
+
+  protected override void OnInitialized()
+  {
+    Prazo = PrazoInicial;
+    ContarHoje = ContarHojeInicial;
+  }
+
+  private Task Salvar()  => OnSalvar.InvokeAsync(new PlannerConfig(Prazo, ContarHoje, false));
+  private Task Remover() => OnSalvar.InvokeAsync(new PlannerConfig(null, ContarHoje, true));
+  private Task Fechar()  => OnFechar.InvokeAsync();
+}

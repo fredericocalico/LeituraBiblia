@@ -8,117 +8,136 @@
 
 <PageTitle>Leitura da Bíblia</PageTitle>
 
+<button id="btnInstall" class="btn btn-outline-primary d-none">Instalar app</button>
+
 <div class="container py-3" style="max-width: 700px">
-  <h3 class="text-center mb-4"><img src="icons/icon-192.png" style="width: 50px"/> Controle de Leitura</h3>
-  
-  <div class="container text-center" >
-    <h6 style="font-size: 85%; padding: 3px; margin: 5px">Use este app para marcar seu progresso na leitura da Bíblia Sagrada. Que Deus te abençoe em sua jornada de leitura e conhecimento da palavra!</h6>  
+  <div class="container justify-content-center text-center">
+    <img src="logo.svg" class="brand-wide" alt="Jornada Bíblica" />  
+  </div>
+
+  <div class="container text-center">
+    <h6 style="font-size: 85%; padding: 3px; margin: 5px">Use este app para marcar seu progresso na leitura da Bíblia Sagrada. Que Deus te abençoe em sua jornada de leitura e conhecimento da palavra!</h6>
   </div>
 
   <!-- Resumos -->
-  <div class="row g-3 mb-3">
-    
-    <div class="col-4 col-md-4">
-      <div class="card card-plain text-center bg-ot">
-        <div class="card-body">
-          <h6 class="card-title">Velho Test</h6>
-          <p class="display-6 fw-bold mb-0">@ProgressoVelho%</p>
-          <small>@LidosVelho/@TotalVelho capítulos</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-4 col-md-4">
-      <div class="card card-plain text-center bg-nt">
-        <div class="card-body">
-          <h6 class="card-title">Novo Test</h6>
-          <p class="display-6 fw-bold mb-0">@ProgressoNovo%</p>
-          <small>@LidosNovo/@TotalNovo capítulos</small>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-4 col-md-4">
-      <div class="card card-plain text-center bg-total">
-        <div class="card-body">
-          <h6 class="card-title">Total</h6>
-          <p class="display-6 fw-bold mb-0">@ProgressoBiblia%</p>
-          <small>@LidosTotais/@TotalCapitulos capítulos</small>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Card de planejamento -->
+  <!-- Totais (um card + tabela) -->
   <div class="row g-3 mb-3">
     <div class="col-12">
-      <div class="card card-plain bg-total">
-        <div class="card-body">
-          <div>
-            <div class="row">
-              <div class="col-10">
-                <h5>Meta de Conclusão</h5>
-              </div>
-              <div class="col-2 text-end align-content-end">
-                @if (cardPlannerIsOpen)
-                {
-                  <i class="fa-solid fa-circle-arrow-up fs-2" style="color: #b3b1b2" @onclick="(() => ToogleCardPlanner())"></i>  
-                }
-                else
-                {
-                  <i class="fa-solid fa-circle-arrow-down fs-2" style="color: #b3b1b2" @onclick="(() => ToogleCardPlanner())"></i>
-                }
-              </div>
-            </div>
-
-            @if (cardPlannerIsOpen || ( PrazoFinal is null && !cardPlannerIsOpen ))
-            {
-              <div class="container text-center mb-2">
-                <small>Defina uma data limite para concluir a leitura da Bíblia</small>
-              </div>
-            }
-
-            @if (cardPlannerIsOpen)
-            {
-              <div class="d-flex align-items-center justify-content-center g-2">
-                <div style="min-width:220px; padding-right: 10px">
-                  <InputDate @bind-Value="PrazoFinal" class="form-control"/>
-                </div>
-                <button class="btn btn-primary" @onclick="SalvarPrazo">Salvar</button>
-              </div>
-              <div class="form-check form-switch m-2">
-                <input class="form-check-input" type="checkbox" id="incHoje" @bind="IncluirHoje"/>
-                <label class="form-check-label" for="incHoje">Contar hoje</label>
-              </div>
-            }
-          </div>
-
-          <div class="mt-3">
-            @if (PrazoFinal is null)
-            {
-              <small>Escolha uma data para ver a leitura diária necessária.</small>
-            }
-            else if (PrazoFinal!.Value.Date < DateTime.Today)
-            {
-              <small class="text-danger"><strong>Atenção:</strong> o prazo escolhido já passou.</small>
-            }
-            else
-            {
-              <div class="d-flex flex-wrap gap-3 text-center align-items-center justify-content-center">
-                @if (cardPlannerIsOpen)
-                {
-                  <span><strong>Capítulos restantes:</strong> @CapitulosRestantes</span>
-                  <span><strong>Dias disponíveis:</strong> @DiasRestantes</span>
-                } 
-                <span style="background-color: #2475b7; color: white; border-radius: 19px; padding: 8px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
-              </div>
-            }
-          </div>
+      <div class="card card-plain">
+        <div class="card-body p-2">
+          <table class="table table-sm mb-0 align-middle">
+            <tbody>
+            <tr>
+              <td class="w-50"><strong>Velho Testamento</strong></td>
+              <td class="text-end">@LidosVelho/@TotalVelho caps</td>
+              <td class="text-end">
+                <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(LidosVelho, TotalVelho)">
+                  @ProgressoVelho%
+                </span>
+                @* alternativa sem cor: <span class="badge rounded-pill bg-dark text-white fw-semibold">@ProgressoVelho%</span> *@
+              </td>
+            </tr>
+            <tr>
+              <td class="w-50"><strong>Novo Testamento</strong></td>
+              <td class="text-end">@LidosNovo/@TotalNovo caps</td>
+              <td class="text-end">
+                <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(LidosNovo, TotalNovo)">
+                  @ProgressoNovo%
+                </span>
+                @* alternativa sem cor: <span class="badge rounded-pill bg-dark text-white fw-semibold">@ProgressoNovo%</span> *@
+              </td>
+            </tr>
+            <tr>
+              <td class="w-50"><strong>Bíblia inteira</strong></td>
+              <td class="text-end">@LidosTotais/@TotalCapitulos caps</td>
+              <td class="text-end">
+                <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(LidosTotais, TotalCapitulos)">
+                  @ProgressoBiblia%
+                </span>
+                @* alternativa sem cor: <span class="badge rounded-pill bg-dark text-white fw-semibold">@ProgressoBiblia%</span> *@
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Meta de Conclusão -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card card-plain">
+        <div class="card-body p-2">
+          @if (PrazoFinal is null)
+          {
+            <h5 class="mb-2">Meta de Conclusão</h5>
+
+            <table class="table table-sm mb-0 align-middle no-last-divider">
+              <tbody>
+              <tr>
+                <td class="text-muted">
+                  <small>
+                    Você pode definir uma data para terminar de ler toda a Bíblia.
+                    Assim calculamos quantos capítulos por dia você precisa ler para cumprir sua meta.
+                  </small>
+                </td>
+                <td class="text-end">
+                  <span class="badge rounded-pill bg-primary text-white pct-badge badge-action"
+                        @onclick="AbrirPlanner">
+                    Definir
+                  </span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          }
+          else
+          {
+            <h5 class="mb-2">Meta de Conclusão</h5>
+
+            <table class="table table-sm mb-0 align-middle no-last-divider">
+              <tbody>
+              <tr>
+                <td class="w-50">
+                  <small class="text-muted">Até @PrazoFinal!.Value.ToString("dd/MM/yyyy") (@(IncluirHoje ? "contando hoje" : "a partir de amanhã"))</small>
+                </td>
+                <td class="text-end">
+                  <span class="badge rounded-pill bg-secondary text-white pct-badge badge-action"
+                        @onclick="AbrirPlanner">
+                    Editar
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Capítulos restantes</td>
+                <td class="text-end">
+                  <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(TotalCapitulos - CapitulosRestantes, TotalCapitulos)">
+                    @CapitulosRestantes
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Dias disponíveis</td>
+                <td class="text-end">
+                  <span class="badge rounded-pill bg-dark text-white pct-badge">@DiasRestantes</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Leitura diária necessária</td>
+                <td class="text-end">
+                  <span class="badge rounded-pill bg-dark text-white pct-badge">@CapsPorDia Caps/Dia</span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="btn-group w-100 mb-3" role="group" aria-label="Filtro de livros">
     <input type="radio" class="btn-check" name="filtroLivros" id="fltTodos"
            checked="@IsFiltro(FiltroLivros.Todos)"
@@ -135,35 +154,78 @@
            @onchange="async _ => await SetFiltroAsync(FiltroLivros.NaoLidos)">
     <label class="btn btn-outline-secondary flex-fill" for="fltNaoLidos">Não lidos</label>
   </div>
-  
-  <!-- Livros -->
-  <div class="row g-3">
-    @foreach (var livro in LivrosFiltrados)
-    {
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="@CardClass(livro)" @onclick="() => AbrirLivro(livro)">
-          <div class="card-body d-flex flex-column justify-content-between text-center align-middle">
-            <h6 class="mb-2 align-content-center text-center">@livro.Nome <label style="@BadgeStyleColor(livro)">@livro.Testamento.Substring(0,1)T </label> </h6>
 
-            <div class="mt-1">
-              <div class="progress" role="progressbar" aria-label="Progresso do livro">
-                <div class="progress-bar" style="width:@CalcularPercentual(livro)%">
-                  @CalcularPercentual(livro)%
-                </div>
-              </div>
-              <small>@LidosLivro(livro)/@livro.Capitulos caps</small>
-            </div>
-          </div>
+  <!-- Livros -->
+  <!-- Velho Testamento -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card card-plain">
+        <div class="card-body p-2">
+          <h5 class="mb-2">Velho Testamento</h5>
+          <table class="table table-sm table-hover mb-0 align-middle">
+            <tbody>
+            @foreach (var livro in BibliaData.Livros
+                        .Where(l => l.Testamento == "Velho")
+                        .Where(PassaFiltroLivro))
+            {
+              var lidos = LidosLivro(livro);
+              <tr @onclick="() => AbrirLivro(livro)">
+                <td class="w-50">@livro.Nome</td>
+                <td class="text-end">@lidos/@livro.Capitulos caps</td>
+                <td class="text-end">
+                  <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(lidos, livro.Capitulos)">
+                    @CalcularPercentual(livro)%
+                  </span>
+                  @* se quiser colorir por testamento, pode usar badge-ot aqui *@
+                </td>
+              </tr>
+            }
+            @if (!BibliaData.Livros.Any(l => l.Testamento == "Velho" && PassaFiltroLivro(l)))
+            {
+              <tr><td colspan="3" class="text-center text-muted">Nenhum livro neste filtro.</td></tr>
+            }
+            </tbody>
+          </table>
         </div>
       </div>
-    }
-    
-    @if (!LivrosFiltrados.Any())
-    {
-      <div class="col-12">
-        <div class="text-center text-muted">Nenhum livro neste filtro.</div>
+    </div>
+  </div>
+
+  <!-- Novo Testamento -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card card-plain">
+        <div class="card-body p-2">
+          <h5 class="mb-2">Novo Testamento</h5>
+          <table class="table table-sm table-hover mb-0 align-middle">
+            <tbody>
+            @foreach (var livro in BibliaData.Livros
+                        .Where(l => l.Testamento == "Novo")
+                        .Where(PassaFiltroLivro))
+            {
+              var lidos = LidosLivro(livro);
+              <tr @onclick="() => AbrirLivro(livro)">
+                <td class="w-50">@livro.Nome</td>
+                <td class="text-end">@lidos/@livro.Capitulos caps</td>
+                <td class="text-end">
+                  <span class="badge rounded-pill pct-badge @BadgeClassFromCounts(lidos, livro.Capitulos)">
+                    @CalcularPercentual(livro)%
+                  </span>
+                  @* se quiser colorir por testamento, pode usar badge-nt aqui *@
+                </td>
+              </tr>
+            }
+            @if (!BibliaData.Livros.Any(l => l.Testamento == "Novo" && PassaFiltroLivro(l)))
+            {
+              <tr>
+                <td colspan="3" class="text-center text-muted">Nenhum livro neste filtro.</td>
+              </tr>
+            }
+            </tbody>
+          </table>
+        </div>
       </div>
-    }
+    </div>
   </div>
 </div>
 
@@ -189,6 +251,41 @@
               OnFechar="FecharModal" />
 }
 
+@if (PlannerAberto)
+{
+  <PlannerModal PrazoInicial="PrazoFinal"
+                ContarHojeInicial="IncluirHoje"
+                OnSalvar="SalvarPlanner"
+                OnFechar="FecharPlanner" />
+}
+
+<style>
+  tr {
+    line-height: 2.3;
+  }
+
+  .table > :not(caption) > *:last-child > * {
+    border-bottom-width: 0 !important;
+  }
+
+  .no-last-divider > :not(caption) > *:last-child > * {
+    border-bottom-width: 0 !important;
+  }
+
+  /* aumenta só o badge da última coluna das tabelas */
+  .table td:last-child .badge{
+    font-size: .95rem;      /* maior que o padrão */
+    padding: .40rem .70rem; /* mais “gordinho” */
+    line-height: 1;         /* evita esticar verticalmente */
+  }
+
+  /* mantém a coluna do badge compacta e sem quebra de linha */
+  .table td:last-child{
+    white-space: nowrap;
+    width: 1%;
+  }
+</style>
+
 @code {
   private Dictionary<string, List<int>> Progresso = new();
   private Livro? LivroSelecionado;
@@ -205,6 +302,11 @@
   private bool IncluirHoje = true;
   private int CapitulosRestantes, DiasRestantes, CapsPorDia;
   
+  // Modal do planner
+  private bool PlannerAberto = false;
+  private void AbrirPlanner() => PlannerAberto = true;
+  private void FecharPlanner() => PlannerAberto = false;
+  
   private enum FiltroLivros { Todos, Lidos, NaoLidos }
   private FiltroLivros FiltroAtual = FiltroLivros.Todos;
 
@@ -219,6 +321,49 @@
       _ => true
     };
   });
+  
+  private string BadgeClassFromCounts(int lidos, int total)
+  {
+    if (total <= 0) return "badge-0";
+    if (lidos <= 0) return "badge-0";
+    if (lidos >= total) return "badge-done";
+    return "badge-progress";
+  }
+
+  // Handler do modal
+  private async Task SalvarPlanner(PlannerModal.PlannerConfig cfg)
+  {
+    if (cfg.Remover)
+    {
+      PrazoFinal = null;
+      await JS.InvokeVoidAsync("localStorage.removeItem", "planner_deadline");
+      // manter preferência "contar hoje" se quiser
+      await JS.InvokeVoidAsync("localStorage.setItem", "planner_include_today", cfg.IncluirHoje ? "true" : "false");
+    }
+    else
+    {
+      PrazoFinal = cfg.PrazoFinal?.Date;
+      IncluirHoje = cfg.IncluirHoje;
+      if (PrazoFinal is not null)
+        await JS.InvokeVoidAsync("localStorage.setItem", "planner_deadline", PrazoFinal!.Value.ToString("yyyy-MM-dd"));
+      await JS.InvokeVoidAsync("localStorage.setItem", "planner_include_today", IncluirHoje ? "true" : "false");
+    }
+
+    RecalcularPlanner();
+    PlannerAberto = false;
+  }
+  
+  private bool PassaFiltroLivro(Livro l)
+  {
+    var lidos = LidosLivro(l);
+    return FiltroAtual switch
+    {
+      FiltroLivros.Todos    => true,
+      FiltroLivros.Lidos    => lidos == l.Capitulos, // 100% lido
+      FiltroLivros.NaoLidos => lidos <  l.Capitulos, // 0% ou em andamento
+      _ => true
+    };
+  }
 
   private bool IsFiltro(FiltroLivros f) => FiltroAtual == f;
 

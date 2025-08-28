@@ -1,6 +1,6 @@
 ﻿{
-  "name": "Leitura da Bíblia",
-  "short_name": "Bíblia",
+  "name": "Jornada Bíblica",
+  "short_name": "Jornada",
   "description": "Controle de leitura por livro e capítulo, 100% offline.",
   "display": "standalone",
   "start_url": "./",
