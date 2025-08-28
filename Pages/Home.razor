@@ -1,6 +1,10 @@
 ﻿@page "/"
+@using System.Text.Json
 @using Biblia.Data
 @inject Biblia.Services.ProgressoService ProgressoService
+@inject HttpClient Http
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JS
 
 <PageTitle>Leitura da Bíblia</PageTitle>
 
@@ -43,7 +47,54 @@
       </div>
     </div>
   </div>
+  
+  <!-- Card de planejamento -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card card-plain bg-total">
+        <div class="card-body">
+          <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div>
+              <h5 class="mb-1 text-center">Meta de Conclusão</h5>
+              <small>Até que data você pretende concluir a leitura da Bíblia inteira?</small>
+            </div>
 
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="incHoje" @bind="IncluirHoje" />
+                <label class="form-check-label" for="incHoje">Contar hoje</label>
+              </div>
+              <div >
+                <InputDate @bind-Value="PrazoFinal" class="form-control" style="width:140px" />
+              </div>
+              <button class="btn btn-primary" @onclick="SalvarPrazo">Salvar</button>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            @if (PrazoFinal is null)
+            {
+              <small>Escolha uma data para ver a leitura diária necessária.</small>
+            }
+            else if (PrazoFinal!.Value.Date < DateTime.Today)
+            {
+              <small class="text-danger"><strong>Atenção:</strong> o prazo escolhido já passou.</small>
+            }
+            else
+            {
+              <div class="d-flex flex-wrap gap-3 text-center align-items-center justify-content-center">
+                <span><strong>Capítulos restantes:</strong> @CapitulosRestantes</span>
+                <span><strong>Dias disponíveis:</strong> @DiasRestantes</span>
+                <span style="background-color: #26b050; border-radius: 10px; padding: 5px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
   <!-- Livros -->
   <div class="row g-3">
     @foreach (var livro in BibliaData.Livros)
@@ -68,6 +119,19 @@
   </div>
 </div>
 
+<br/>
+
+<div class="container text-center">
+  <label style="background-color: #26b050; border-radius: 10px; font-size: 75%; padding: 6px; margin: 6px" >@contador visitas desde 28/08/2025</label>
+</div>
+
+<br/>
+
+<div class="container text-center">
+  <label>Desenvolvido por Antonio Frederico | <a href="mailto:fredericocalico@gmail.com">Envie-me um e-mail</a></label>
+</div>
+
+
 @if (LivroSelecionado is not null)
 {
   <LivroModal Livro="LivroSelecionado"
@@ -79,11 +143,17 @@
 @code {
   private Dictionary<string, List<int>> Progresso = new();
   private Livro? LivroSelecionado;
+  private int contador = 0;
 
   // Resumos
   private int ProgressoBiblia, ProgressoVelho, ProgressoNovo;
   private int TotalCapitulos, TotalVelho, TotalNovo;
   private int LidosTotais, LidosVelho, LidosNovo;
+  
+  // Planejador
+  private DateTime? PrazoFinal;
+  private bool IncluirHoje = true;
+  private int CapitulosRestantes, DiasRestantes, CapsPorDia;
   
   private string CardClass(Livro l)
     => $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}";
@@ -93,8 +163,14 @@
 
   protected override async Task OnInitializedAsync()
   {
+    
+    Progresso = await ProgressoService.CarregarAsync();
+    AtualizarProgresso();          // já computa totais
+    await CarregarPlannerAsync();  // carrega prazo + incluirHoje do localStorage
+    
     Progresso = await ProgressoService.CarregarAsync();
     AtualizarProgresso();
+    await AtualizarContador();
   }
 
   private void AbrirLivro(Livro livro) => LivroSelecionado = livro;
@@ -118,6 +194,7 @@
     LivroSelecionado = null;
   }
 
+  // sempre que atualizar totais (ex.: ao salvar capítulos) recalcule também o planner
   private void AtualizarProgresso()
   {
     var livros = BibliaData.Livros;
@@ -133,5 +210,88 @@
     ProgressoBiblia = TotalCapitulos == 0 ? 0 : (int)Math.Round((double)LidosTotais / TotalCapitulos * 100);
     ProgressoVelho  = TotalVelho     == 0 ? 0 : (int)Math.Round((double)LidosVelho  / TotalVelho     * 100);
     ProgressoNovo   = TotalNovo      == 0 ? 0 : (int)Math.Round((double)LidosNovo   / TotalNovo      * 100);
+
+    RecalcularPlanner();
   }
+  
+  private async Task AtualizarContador()
+  {
+    try
+    {
+      var apiUrl = "https://api.api-ninjas.com/v1/counter?id=biblia&hit=true";
+      Http.DefaultRequestHeaders.Add("X-Api-Key", "HcNlcFpPkN6svuNN4tshqQ==5rcO32X3qCgbJYjh"); 
+
+      var response = await Http.GetAsync(apiUrl);
+
+      if (response.IsSuccessStatusCode)
+      {
+        var responseContent = await response.Content.ReadAsStringAsync();
+                
+        // Desserializar o JSON e extrair o valor
+        var jsonResponse = JsonSerializer.Deserialize<ApiResponse>(responseContent);
+        contador = jsonResponse?.value ?? -1;
+      }
+      else
+      {
+        contador = -1; 
+      }
+    }
+    catch
+    {
+      contador = -1; 
+    }
+  }
+  
+  
+
+  private async Task CarregarPlannerAsync()
+  {
+    var s = await JS.InvokeAsync<string>("localStorage.getItem", "planner_deadline");
+    if (!string.IsNullOrWhiteSpace(s) && DateTime.TryParse(s, out var d))
+      PrazoFinal = d.Date;
+
+    var inc = await JS.InvokeAsync<string>("localStorage.getItem", "planner_include_today");
+    if (!string.IsNullOrWhiteSpace(inc))
+      IncluirHoje = inc == "true";
+
+    RecalcularPlanner();
+  }
+  
+  private async Task SalvarPrazo()
+  {
+    if (PrazoFinal is not null)
+      await JS.InvokeVoidAsync("localStorage.setItem", "planner_deadline", PrazoFinal!.Value.ToString("yyyy-MM-dd"));
+    await JS.InvokeVoidAsync("localStorage.setItem", "planner_include_today", IncluirHoje ? "true" : "false");
+    RecalcularPlanner();
+  }
+
+  private void RecalcularPlanner()
+  {
+    CapitulosRestantes = Math.Max(0, TotalCapitulos - LidosTotais);
+
+    if (PrazoFinal is null)
+    {
+      DiasRestantes = 0;
+      CapsPorDia = 0;
+      return;
+    }
+
+    var hoje = DateTime.Today;
+    var fim  = PrazoFinal.Value.Date;
+
+    // se "Contar hoje" estiver ligado, incluímos o dia de hoje no total de dias
+    var dias = (fim - hoje).Days + (IncluirHoje ? 1 : 0);
+    DiasRestantes = Math.Max(0, dias);
+
+    CapsPorDia = (DiasRestantes <= 0 || CapitulosRestantes <= 0)
+      ? 0
+      : (int)Math.Ceiling((double)CapitulosRestantes / DiasRestantes);
+  }
+  
+  private class ApiResponse
+  {
+    public string? id { get; set; }
+    public int? value { get; set; }
+  }
+  
 }
