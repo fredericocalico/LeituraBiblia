@@ -23,7 +23,7 @@
         <div class="card-body">
           <h6 class="card-title">Velho Test</h6>
           <p class="display-6 fw-bold mb-0">@ProgressoVelho%</p>
-          <small>@LidosVelho/@TotalVelho cap</small>
+          <small>@LidosVelho/@TotalVelho capítulos</small>
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@
         <div class="card-body">
           <h6 class="card-title">Novo Test</h6>
           <p class="display-6 fw-bold mb-0">@ProgressoNovo%</p>
-          <small>@LidosNovo/@TotalNovo cap</small>
+          <small>@LidosNovo/@TotalNovo capítulos</small>
         </div>
       </div>
     </div>
@@ -41,9 +41,9 @@
     <div class="col-4 col-md-4">
       <div class="card card-plain text-center bg-total">
         <div class="card-body">
-          <h6 class="card-title">Bíblia inteira</h6>
+          <h6 class="card-title">Total</h6>
           <p class="display-6 fw-bold mb-0">@ProgressoBiblia%</p>
-          <small>@LidosTotais/@TotalCapitulos cap</small>
+          <small>@LidosTotais/@TotalCapitulos capítulos</small>
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@
                   <span><strong>Capítulos restantes:</strong> @CapitulosRestantes</span>
                   <span><strong>Dias disponíveis:</strong> @DiasRestantes</span>
                 } 
-                <span style="background-color: #26b050; border-radius: 19px; padding: 8px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
+                <span style="background-color: #2475b7; color: white; border-radius: 19px; padding: 8px"><strong>Leitura diária necessária:</strong> @CapsPorDia Cap/Dia</span>
               </div>
             }
           </div>
@@ -119,9 +119,26 @@
     </div>
   </div>
   
+  <div class="btn-group w-100 mb-3" role="group" aria-label="Filtro de livros">
+    <input type="radio" class="btn-check" name="filtroLivros" id="fltTodos"
+           checked="@IsFiltro(FiltroLivros.Todos)"
+           @onchange="async _ => await SetFiltroAsync(FiltroLivros.Todos)">
+    <label class="btn btn-outline-secondary flex-fill" for="fltTodos">Todos</label>
+
+    <input type="radio" class="btn-check" name="filtroLivros" id="fltLidos"
+           checked="@IsFiltro(FiltroLivros.Lidos)"
+           @onchange="async _ => await SetFiltroAsync(FiltroLivros.Lidos)">
+    <label class="btn btn-outline-secondary flex-fill" for="fltLidos">Lidos</label>
+
+    <input type="radio" class="btn-check" name="filtroLivros" id="fltNaoLidos"
+           checked="@IsFiltro(FiltroLivros.NaoLidos)"
+           @onchange="async _ => await SetFiltroAsync(FiltroLivros.NaoLidos)">
+    <label class="btn btn-outline-secondary flex-fill" for="fltNaoLidos">Não lidos</label>
+  </div>
+  
   <!-- Livros -->
   <div class="row g-3">
-    @foreach (var livro in BibliaData.Livros)
+    @foreach (var livro in LivrosFiltrados)
     {
       <div class="col-12 col-md-6 col-lg-4">
         <div class="@CardClass(livro)" @onclick="() => AbrirLivro(livro)">
@@ -138,6 +155,13 @@
             </div>
           </div>
         </div>
+      </div>
+    }
+    
+    @if (!LivrosFiltrados.Any())
+    {
+      <div class="col-12">
+        <div class="text-center text-muted">Nenhum livro neste filtro.</div>
       </div>
     }
   </div>
@@ -181,23 +205,71 @@
   private bool IncluirHoje = true;
   private int CapitulosRestantes, DiasRestantes, CapsPorDia;
   
+  private enum FiltroLivros { Todos, Lidos, NaoLidos }
+  private FiltroLivros FiltroAtual = FiltroLivros.Todos;
+
+  private IEnumerable<Livro> LivrosFiltrados => BibliaData.Livros.Where(l =>
+  {
+    var lidos = LidosLivro(l);
+    return FiltroAtual switch
+    {
+      FiltroLivros.Todos    => true,
+      FiltroLivros.Lidos    => lidos == l.Capitulos,
+      FiltroLivros.NaoLidos => lidos <  l.Capitulos,
+      _ => true
+    };
+  });
+
+  private bool IsFiltro(FiltroLivros f) => FiltroAtual == f;
+
+  private async Task SetFiltroAsync(FiltroLivros f)
+  {
+    FiltroAtual = f;
+    var key = f switch
+    {
+      FiltroLivros.Lidos    => "lidos",
+      FiltroLivros.NaoLidos => "naolidos",
+      _                     => "todos"
+    };
+    await JS.InvokeVoidAsync("localStorage.setItem", "filter_view", key);
+  }
+
+  private async Task CarregarFiltroAsync()
+  {
+    var s = await JS.InvokeAsync<string>("localStorage.getItem", "filter_view");
+    FiltroAtual = s?.ToLowerInvariant() switch
+    {
+      "lidos"    => FiltroLivros.Lidos,
+      "naolidos" => FiltroLivros.NaoLidos,
+      _          => FiltroLivros.Todos
+    };
+  }
+
   private string CardClass(Livro l)
-    => $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}";
+  {
+    if (l.Capitulos == LidosLivro(l))
+    {
+      return $"card card-plain clickable h-100 bg-lido"; 
+    }
+    else
+    {
+     return $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}"; 
+    }
+  }
+     
 
   private string BadgeStyleColor(Livro l) =>
-    $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 70%; padding: 3px";
+      $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 70%; padding: 3px";  
+    
 
   private void ToogleCardPlanner() => cardPlannerIsOpen = (!cardPlannerIsOpen);
   
   protected override async Task OnInitializedAsync()
   {
-    
-    Progresso = await ProgressoService.CarregarAsync();
-    AtualizarProgresso();          // já computa totais
-    await CarregarPlannerAsync();  // carrega prazo + incluirHoje do localStorage
-    
     Progresso = await ProgressoService.CarregarAsync();
     AtualizarProgresso();
+    await CarregarPlannerAsync();
+    await CarregarFiltroAsync();   // <- aqui
     await AtualizarContador();
   }
 

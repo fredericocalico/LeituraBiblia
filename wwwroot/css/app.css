@@ -119,6 +119,7 @@ code {
     --ot:#ffffff;      /* Velho Testamento */
     --nt:#ffffff;      /* Novo Testamento  */
     --total:#ffffff;   /* Bíblia inteira    */
+    --lido:#bbcbc3;    /* Livro Lido */
 }
 
 /* Card “flat”: sem borda, sem sombra */
@@ -130,6 +131,7 @@ code {
 }
 .bg-ot{ background-color:var(--ot) !important; }
 .bg-nt{ background-color:var(--nt) !important; }
+.bg-lido{ background-color:var(--lido) !important; }
 .bg-total{ background-color:var(--total) !important; }
 
 /* Barrinha de progresso legível sobre o fundo colorido */
