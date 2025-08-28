@@ -68,12 +68,18 @@ a, .btn-link {
     }
 
 .loading-progress {
-    position: relative;
+   /* position: relative;
     display: block;
-    width: 8rem;
-    height: 8rem;
-    margin: 20vh auto 1rem auto;
-    background: #cacacd;
+    width: 15rem;
+    height: 8rem; */
+    width: 100%;
+    height: 100dvh;
+    place-content: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /*margin: 20vh auto 1rem auto; 
+    background: #cacacd; */
 }
 
     .loading-progress circle {
@@ -173,4 +179,4 @@ html, body { background:#f9f6f7; }
 .brand-mark{ width:28px; height:28px; }
 .brand-title{ font-weight:700; letter-spacing:.5px; }
 .brand-sub{ color:#666; }
-.brand-wide{ height:120px; } /* caso use o logo-wordmark */
+.brand-wide{ width:350px; } /* caso use o logo-wordmark */
