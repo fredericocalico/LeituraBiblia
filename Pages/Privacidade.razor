@@ -1,0 +1,56 @@
+﻿@page "/privacidade"
+@inject NavigationManager NavigationManager 
+
+<div class="container">
+    <button class="btn btn-light" onclick="@(() => NavigationManager.NavigateTo("/"))"><i class="fa-solid fa-circle-arrow-left"></i></button>
+    <br/>
+    <br/>
+    <h3>Privacidade</h3>
+    <p><strong>Jornada Bíblica</strong> é um aplicativo de uso pessoal que roda 100% no seu navegador.</p>
+
+    <h5>O que armazenamos</h5>
+    <ul>
+        <li><strong>Progresso de leitura, metas e preferências</strong> — ficam <em>somente</em> no seu dispositivo
+            (localStorage e cache do PWA). Não enviamos esses dados para nenhum servidor.
+        </li>
+    </ul>
+
+    <h5>O que é enviado pela internet</h5>
+    <ul>
+        <li><strong>Contador de visitas</strong> — usamos um serviço de terceiros (<em>api.counter</em>) apenas para
+            medir acessos. Esse serviço pode registrar dados técnicos como endereço IP, user-agent, página acessada e
+            horário, e pode usar cookies ou armazenamento próprio no domínio deles. Não vinculamos isso à sua
+            identidade.
+        </li>
+        <li><strong>Hospedagem</strong> — o site é servido pelo GitHub Pages, que pode gerar logs de acesso (IP,
+            user-agent) por motivos operacionais.
+        </li>
+    </ul>
+
+    <h5>Cookies</h5>
+    <p>Não usamos cookies próprios. O contador de visitas pode definir cookies/armazenamento no domínio do provedor.</p>
+
+    <h5>Como controlar</h5>
+    <ul>
+        <li>Você pode <strong>limpar</strong> ou <strong>exportar/importar</strong> seu progresso a qualquer momento nas
+            configurações do app.
+        </li>
+        <li>Se preferir, pode <strong>desativar o contador</strong> nas configurações (ou bloquear requisições ao
+            domínio do contador no seu navegador).
+        </li>
+    </ul>
+
+    <h5>Contato</h5>
+    <p>Dúvidas sobre privacidade? Entre em contato pelo repositório do projeto.</p>
+</div>
+
+<style>
+    .container {
+        margin: 10px;
+        padding: 10px;
+        max-width: 800px;
+    }
+</style>
+
+@code {
+}

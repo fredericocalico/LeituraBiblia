@@ -9,13 +9,13 @@
         <button type="button" class="btn-close" @onclick="Fechar"></button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body cap-grid">
         <div class="row g-2">
           @for (int i = 1; i <= Livro.Capitulos; i++)
           {
-            var idx = i;           // <- cópia local, evita captura do loop
-            <div class="col-3 col-sm-2 col-md-2" @key="idx">
-              <div class="form-check">
+            var idx = i;
+            <div class="col-4 col-sm-3 col-md-2 cap-col" @key="idx">  @* 3 por linha no celular *@
+              <div class="form-check d-flex align-items-center">
                 <input class="form-check-input"
                        type="checkbox"
                        id="@($"cap{idx}")"

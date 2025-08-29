@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Text.Json
+@using System.Text.Json.Serialization
 @using Biblia.Data
 @inject Biblia.Services.ProgressoService ProgressoService
 @inject HttpClient Http
@@ -10,7 +11,7 @@
 
 <button id="btnInstall" class="btn btn-outline-primary d-none">Instalar app</button>
 
-<div class="container py-3" style="max-width: 700px">
+<div class="container" style="max-width: 700px">
   <div class="container justify-content-center text-center">
     <img src="logo.png" style="width: 350px" alt="Jornada Bíblica" />  
   </div>
@@ -232,16 +233,26 @@
 <br/>
 
 <div class="container text-center">
-  <label style="background-color: #26b050; border-radius: 10px; font-size: 75%; padding: 6px; margin: 6px" >@contador visitas desde 28/08/2025</label>
+  <a href="/privacidade" class="link-secondary">Privacidade</a>
 </div>
 
 <br/>
 
 <div class="container text-center">
-  <label style="font-size: 80%">Desenvolvido por Antonio Frederico | <a href="mailto:fredericocalico@gmail.com">Envie-me um e-mail</a></label>
+  <label style="background-color: #26b050; border-radius: 10px; color: white; font-size: 75%; padding: 6px; margin: 6px" >@contador visitas</label>
 </div>
 
 <br/>
+
+<div class="container text-center align-middle">
+  <h5>Desenvolvido por Antonio Frederico</h5> <a href="mailto:fredericocalico@gmail.com"><i class="fa-solid fa-at fs-2"></i></a> <a href="https://www.instagram.com/antoniofrederico17/"><i class="fa-brands fa-instagram fs-2"></i></a>
+</div>
+
+<br/>
+
+<div class="container text-center align-middle">
+  <h6>"O temor do Senhor é o princípio da sabedoria, e o conhecimento do Santo é entendimento" (Provérbios 9:10)</h6>  
+</div>
 
 @if (LivroSelecionado is not null)
 {
@@ -310,18 +321,6 @@
   private enum FiltroLivros { Todos, Lidos, NaoLidos }
   private FiltroLivros FiltroAtual = FiltroLivros.Todos;
 
-  private IEnumerable<Livro> LivrosFiltrados => BibliaData.Livros.Where(l =>
-  {
-    var lidos = LidosLivro(l);
-    return FiltroAtual switch
-    {
-      FiltroLivros.Todos    => true,
-      FiltroLivros.Lidos    => lidos == l.Capitulos,
-      FiltroLivros.NaoLidos => lidos <  l.Capitulos,
-      _ => true
-    };
-  });
-  
   private string BadgeClassFromCounts(int lidos, int total)
   {
     if (total <= 0) return "badge-0";
@@ -390,31 +389,12 @@
     };
   }
 
-  private string CardClass(Livro l)
-  {
-    if (l.Capitulos == LidosLivro(l))
-    {
-      return $"card card-plain clickable h-100 bg-lido"; 
-    }
-    else
-    {
-     return $"card card-plain clickable h-100 {(l.Testamento == "Velho" ? "bg-ot" : "bg-nt")}"; 
-    }
-  }
-     
-
-  private string BadgeStyleColor(Livro l) =>
-      $"background-color: {(l.Testamento == "Velho" ? "#0f5132" : "#6f42c1")}; ; border-radius: 3px; color: white; font-size: 70%; padding: 3px";  
-    
-
-  private void ToogleCardPlanner() => cardPlannerIsOpen = (!cardPlannerIsOpen);
-  
-  protected override async Task OnInitializedAsync()
+ protected override async Task OnInitializedAsync()
   {
     Progresso = await ProgressoService.CarregarAsync();
     AtualizarProgresso();
     await CarregarPlannerAsync();
-    await CarregarFiltroAsync();   // <- aqui
+    await CarregarFiltroAsync();   
     await AtualizarContador();
   }
 
@@ -459,36 +439,6 @@
     RecalcularPlanner();
   }
   
-  private async Task AtualizarContador()
-  {
-    try
-    {
-      var apiUrl = "https://api.api-ninjas.com/v1/counter?id=biblia&hit=true";
-      Http.DefaultRequestHeaders.Add("X-Api-Key", "HcNlcFpPkN6svuNN4tshqQ==5rcO32X3qCgbJYjh"); 
-
-      var response = await Http.GetAsync(apiUrl);
-
-      if (response.IsSuccessStatusCode)
-      {
-        var responseContent = await response.Content.ReadAsStringAsync();
-                
-        // Desserializar o JSON e extrair o valor
-        var jsonResponse = JsonSerializer.Deserialize<ApiResponse>(responseContent);
-        contador = jsonResponse?.value ?? -1;
-      }
-      else
-      {
-        contador = -1; 
-      }
-    }
-    catch
-    {
-      contador = -1; 
-    }
-  }
-  
-  
-
   private async Task CarregarPlannerAsync()
   {
     var s = await JS.InvokeAsync<string>("localStorage.getItem", "planner_deadline");
@@ -533,10 +483,86 @@
       : (int)Math.Ceiling((double)CapitulosRestantes / DiasRestantes);
   }
   
-  private class ApiResponse
+  
+  private async Task AtualizarContador()
   {
-    public string? id { get; set; }
-    public int? value { get; set; }
+    try
+    {
+      var apiUrl = "https://api.counterapi.dev/v2/projects/jornada/up";
+
+      var response = await Http.GetAsync(apiUrl);
+
+      if (response.IsSuccessStatusCode)
+      {
+        var responseContent = await response.Content.ReadAsStringAsync();
+                
+        // Desserializar o JSON e extrair o valor
+        var jsonResponse = JsonSerializer.Deserialize<CounterResponse>(responseContent);
+        contador = (jsonResponse?.Data.UpCount ?? 0);
+      }
+      else
+      {
+        Console.WriteLine($"Erro ao executar api do contador: {response.Headers.ToString()}");
+        contador = 1000; 
+      }
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Erro ao executar api do contador: {ex.Message}");
+      contador = 1000; 
+    }
+  }
+  
+  public sealed class CounterResponse
+  {
+    [JsonPropertyName("code")]
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    public int Code { get; set; }
+
+    [JsonPropertyName("data")]
+    public CounterData Data { get; set; } = default!;
+
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = "";
+  }
+
+  public sealed class CounterData
+  {
+    [JsonPropertyName("created_at")]
+    public DateTimeOffset CreatedAt { get; set; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = "";
+
+    [JsonPropertyName("down_count")]
+    public int DownCount { get; set; }
+
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
+
+    [JsonPropertyName("slug")]
+    public string Slug { get; set; } = "";
+
+    [JsonPropertyName("team_id")]
+    public int TeamId { get; set; }
+
+    [JsonPropertyName("up_count")]
+    public int UpCount { get; set; }
+
+    [JsonPropertyName("updated_at")]
+    public DateTimeOffset UpdatedAt { get; set; }
+
+    [JsonPropertyName("user_id")]
+    public int UserId { get; set; }
+
+    [JsonPropertyName("workspace_id")]
+    public int WorkspaceId { get; set; }
+
+    [JsonPropertyName("workspace_slug")]
+    public string WorkspaceSlug { get; set; } = "";
   }
   
 }

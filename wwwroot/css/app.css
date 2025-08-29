@@ -180,3 +180,24 @@ html, body { background:#f9f6f7; }
 .brand-title{ font-weight:700; letter-spacing:.5px; }
 .brand-sub{ color:#666; }
 .brand-wide{ width:350px; } /* caso use o logo-wordmark */
+
+/* área do modal de capítulos */
+.cap-grid .form-check-input{
+    width: 1.45rem;
+    height: 1.45rem;
+}
+.cap-grid .form-check-label{
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-left: .35rem;
+    line-height: 1.2;
+}
+
+/* dar um respiro no toque */
+.cap-col{ padding-top: .35rem; padding-bottom: .35rem; }
+
+/* no celular, deixa ainda maior */
+@media (max-width: 576px){
+    .cap-grid .form-check-input{ width: 1.65rem; height: 1.65rem; }
+    .cap-grid .form-check-label{ font-size: 1.25rem; }
+}
