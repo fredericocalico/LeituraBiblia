@@ -201,3 +201,5 @@ html, body { background:#f9f6f7; }
     .cap-grid .form-check-input{ width: 1.65rem; height: 1.65rem; }
     .cap-grid .form-check-label{ font-size: 1.25rem; }
 }
+
+footer .link-secondary:hover { color:#000 !important; }
